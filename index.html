@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<style type="text/css">
+			*{
+				margin: 0px;
+			}
+			.stage{
+				width: 1200px;
+				height: 500px;
+				border-bottom: 140px solid #ff6700;
+				position: relative;
+			}
+			.stage .then_island{
+				position: absolute;
+				bottom: 0px;
+				left: 0px;
+				background-color: #000;
+				height: 150px;
+				width: 60px;
+			}
+			.stage .now_island{
+				position: absolute;
+				bottom: 0px;
+				left: 300px;
+				background-color: #000;
+				height: 150px;
+				width: 40px;
+			}
+			.stage .hero{
+				position: absolute;
+				width: 30px;
+				height: 30px;
+				background-color: coral;
+				bottom: 150px;
+				left: 30px;
+			}
+			.stage .bar{
+				
+				position: absolute;
+				bottom: 145px;
+				left: 55px;
+				width: 5px;
+				height: 5px;
+				background-color: #000;
+				-webkit-transform:transition3d(0,0,0);
+			}
+		</style>
+	</head>
+	<body>
+		<audio src="img/Lonely.mp3" autoplay="autoplay"></audio>
+		<div class="stage">
+			<div class="then_island" id="then_island"></div>
+			<div class="now_island" id="now_island"></div>
+			<div class="hero" id="hero"></div>
+			<div class="bar" id="bar"></div>
+		</div>
+		
+		<script type="text/javascript">
+			var bar = document.getElementById("bar");
+			var then_island = document.getElementById("then_island");
+			var now_island = document.getElementById("now_island");
+			var hero = document.getElementById("hero");
+			var bar_length = 0;
+			//按键事件处理
+			var keysDown = [];
+			addEventListener("keydown", function(e) {
+				keysDown[e.keyCode] = true;
+			}, false);
+			addEventListener("keyup", function(e) {
+				bar_obj.accept = false;
+				delete keysDown[e.keyCode];
+			}, false);
+			var hero_obj = {
+				x_speed: 200,
+				left: 20,
+				finish: false
+			}
+			var island = {
+				x_speed: 100
+			}
+			var bar_obj = {
+				speed: 260,
+				change: false,
+				width: 0,
+				finish: false,
+				check: false,
+				accept: true
+			}
+			function change_bar(dalte){
+				bar_length += dalte * bar_obj.speed;
+				
+				bar.style.height = bar_length + "px";
+				return bar_length;
+			}
+			function height_width(bar_height){
+				bar.style.height = "5px";
+				bar.style.width = bar_height + "px";
+//				bar_obj.width = bar_height;
+			}
+			function change(dalte){
+				if(bar_obj.accept && 32 in keysDown) {
+					bar_height = change_bar(dalte);
+					bar_obj.change = true;
+					
+				}else if(bar_obj.change){
+					height_width(bar_height);
+					bar_obj.change = false;
+					bar_obj.finish = true;
+				}else if(bar_obj.finish){
+					hero_obj.left += dalte * hero_obj.x_speed;
+					hero.style.left = hero_obj.left + "px";
+					if(bar.offsetWidth>now_island.offsetLeft-55 && bar.offsetWidth<now_island.offsetLeft-55 + now_island.offsetWidth){
+						bar_obj.check = true;
+					}
+					if(bar_obj.finish && bar_obj.check){
+						if(hero.offsetLeft>=now_island.offsetLeft + now_island.offsetWidth - 40){
+							bar_obj.finish = false;
+							hero.finish = true;
+							
+						}
+					}
+					if(bar_obj.finish && !bar_obj.check){
+						if(hero.offsetLeft>=bar.offsetWidth + 25){
+							bar_obj.finish = false;
+							alert("gg");
+						}
+					}
+					
+//					if(hero.offsetLeft>=bar.offsetWidth + 25){
+//						bar_obj.finish = false;
+//					}
+				}
+				if(hero.finish){
+					var div = document.getElementsByTagName("div");
+					for(var i=1;i<div.length;i++){
+						div[i].style.left = (div[i].offsetLeft - dalte * 100) + "px";
+					}
+					if(now_island.offsetLeft<60 - now_island.offsetWidth){
+						hero.finish = false;
+						console.log("ok");
+						
+						init_();
+					}
+					
+				}
+				
+				
+			}
+			function main(){
+				var now_time = Date.now();
+				var dalte = now_time - then_time;
+				change(dalte/1000);
+				
+				then_time = now_time;
+				
+				requestAnimationFrame(function(){main()});
+			}
+			function init_(){
+				hero_obj = {
+					x_speed: 200,
+					left: 20,
+					finish: false
+				}
+				bar_obj = {
+					speed: 260,
+					change: false,
+					width: 0,
+					finish: false,
+					check: false
+				}
+				bar_obj.accept = true;
+				bar_length = 0;
+				bar.style.left = "55px"
+				hero.style.left = "20px";
+				bar.style.width = "5px";
+				bar.style.height = "5px";
+				now_island.style.left = (60 - now_island.offsetWidth) + "px";
+				then_island.style.left = Math.random()*350+50 + "px";
+				then_island.style.width = Math.random()*50+60 + "px";
+				var el = then_island;
+				then_island = now_island;
+				now_island = el;
+			}
+			function init(){
+				hero.style.left = "20px";
+				then_island.style.left = (60 - then_island.offsetWidth) + "px";
+				now_island.style.left = Math.random()*350+50 + "px";
+				now_island.style.width = Math.random()*50+60 + "px";
+			}
+			var then_time = Date.now();
+			
+			then_island.style.width = Math.random()*60+30 + "px";
+			init();
+			main();
+		</script>
+	</body>
+</html>
